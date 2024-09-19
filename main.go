@@ -1,6 +1,7 @@
 package main
 
 import (
+<<<<<<< Updated upstream
 	"bufio"
 	"fmt"
 	"os"
@@ -65,4 +66,11 @@ func main() {
 			fmt.Println("Unknown command. Type 'help' for a list of commands.")
 		}
 	}
+=======
+	challenge1 "crypto-tools/set1"
+)
+
+func main() {
+	challenge1.Xor()
+>>>>>>> Stashed changes
 }

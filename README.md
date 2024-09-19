@@ -1,2 +1,2 @@
 # crypto-tools
-suite of crypto tools mostly for learning golang
+suite of crypto tools for cryptopals challenge and also learning golang
