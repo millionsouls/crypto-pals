@@ -1,9 +1,10 @@
 package set1
 
 import (
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+
+	"crypto-tools/util"
 )
 
 func Hexb64() {
@@ -13,7 +14,5 @@ func Hexb64() {
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	b64 := base64.StdEncoding.EncodeToString(bytes)
-	fmt.Println(b64)
+	fmt.Println(util.Encodeb64(bytes))
 }
