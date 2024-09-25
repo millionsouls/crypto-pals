@@ -4,9 +4,8 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"unicode"
 )
-
-type Bytes []byte
 
 func DecodeHex(hexstr string) []byte {
 	bytes, err := hex.DecodeString(hexstr)
@@ -18,15 +17,17 @@ func DecodeHex(hexstr string) []byte {
 	return bytes
 }
 
-func Encodeb64(bytes []byte) string {
+func EncodeB64(bytes []byte) string {
 	b64 := base64.StdEncoding.EncodeToString(bytes)
 	return b64
 }
 
-func Xor(key byte, b Bytes) Bytes {
-	result := make(Bytes, len(b))
-	for i := range b {
-		result[i] = b[i] ^ key
+func CleanText(text []byte) []byte {
+	var cleaned []byte
+	for _, b := range text {
+		if unicode.IsPrint(rune(b)) {
+			cleaned = append(cleaned, b)
+		}
 	}
-	return result
+	return cleaned
 }
