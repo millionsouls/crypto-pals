@@ -62,7 +62,7 @@ func FindXOR(hexStr string) (string, string, float64) {
 		cleaned := CleanText(xored)
 		score := ChiSquaredScore(cleaned)
 
-		if score < bestScore && score != 0 {
+		if score < bestScore && score > 0 {
 			bestScore = score
 			bestChar = byte(i)
 			bestResult = cleaned
