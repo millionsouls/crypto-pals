@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("info.txt")
+	file, err := os.Open("data.txt")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return

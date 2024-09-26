@@ -25,6 +25,24 @@ func Xor(key byte, b []byte) []byte {
 	return result
 }
 
+func RXor(key []byte, b []byte) []byte {
+	diff := len(b) / len(key)
+	remain := len(b) % len(key)
+	newKey := make([]byte, 0, len(b))
+
+	for i := 0; i < diff; i++ {
+		newKey = append(newKey, key...)
+	}
+	newKey = append(newKey, key[:remain]...)
+
+	res := make([]byte, len(b))
+	for i := 0; i < len(b); i++ {
+		res[i] = b[i] ^ newKey[i]
+	}
+
+	return res
+}
+
 func ChiSquaredScore(text []byte) float64 {
 	frequency := make(map[rune]int)
 	totalLetters := 0
