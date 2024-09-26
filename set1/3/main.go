@@ -17,7 +17,7 @@ var freqTable = map[rune]float64{
 	'z': 0.0007,
 }
 
-func chiSquaredScore(text []byte) float64 {
+func chiSquaredScore(text []byte) float64 { // to util
 	frequency := make(map[rune]int)
 	totalLetters := 0
 
@@ -46,7 +46,7 @@ func chiSquaredScore(text []byte) float64 {
 	return score
 }
 
-func cleanText(text []byte) []byte {
+func cleanText(text []byte) []byte { // to util
 	var cleaned []byte
 	for _, b := range text {
 		if unicode.IsPrint(rune(b)) {
