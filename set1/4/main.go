@@ -19,7 +19,7 @@ func main() {
 	defer file.Close()
 
 	var bestResult string
-	var bestKey string
+	var bestKey byte
 	bestScore := math.MaxFloat64
 
 	scanner := bufio.NewScanner(file)
@@ -44,5 +44,5 @@ func main() {
 
 	fmt.Printf("Best Result: %s\n", bestResult)
 	fmt.Printf("Best Score: %f\n", bestScore)
-	fmt.Printf("Best Key: %s\n", bestKey)
+	fmt.Printf("Best Key: %s\n", string(bestKey))
 }
