@@ -29,7 +29,7 @@ func main() {
 			continue
 		}
 
-		key, result, score := util.FindXOR(line)
+		key, result, score := util.FindXOR(util.DecodeHex(line))
 		if score < bestScore && score != 0 {
 			bestScore = score
 			bestResult = result

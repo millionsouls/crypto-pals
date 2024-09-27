@@ -127,8 +127,7 @@ func NewChiSquared(inp []byte) (float64, float64) {
 	return score, 1 - distuv.ChiSquared{K: df}.CDF(score)
 }
 
-func FindXOR(hexStr string) (byte, string, float64) {
-	data := DecodeHex(hexStr)
+func FindXOR(data []byte) (byte, string, float64) {
 	bestScore := math.MaxFloat64
 	bestChar := byte(0)
 	bestResult := []byte{}
@@ -136,13 +135,13 @@ func FindXOR(hexStr string) (byte, string, float64) {
 
 	for i := 0; i <= 255; i++ {
 		xored := Xor(byte(i), data)
-		cleaned := CleanText(xored)
-		score, prob := NewChiSquared(cleaned)
+		// cleaned := CleanText(xored)
+		score, prob := NewChiSquared(xored)
 
 		if prob >= bestProb && score > 0 {
 			bestScore = score
 			bestChar = byte(i)
-			bestResult = cleaned
+			bestResult = xored
 			bestProb = prob
 		}
 

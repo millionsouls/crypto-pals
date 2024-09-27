@@ -14,29 +14,47 @@ breaking ciphertext into keysize length blocks
 transpose blocks
 */
 
-type KeySize struct {
+type Keysize struct {
 	size int
 	hd   float64
 }
 
-func findKeySize(data []byte) int {
-	keySizes := make([]KeySize, 39)
+func hamDis(one []byte, two []byte) int { // to util
+	oneLen := len(one)
+	twoLen := len(two)
+	diff := 0
 
-	for keySize := 2; keySize < 41; keySize++ {
-		firstBlock := data[:keySize]
-		secondBlock := data[keySize : 2*keySize]
+	if oneLen != twoLen {
+		panic("Inputs of different lengths")
+	}
 
-		dis := hamDis(firstBlock, secondBlock)
-		hd := float64(dis) / float64(keySize)
-
-		keySizes[keySize-2] = KeySize{keySize, hd}
-
-		/*
-			if normalizedDistance < bestDistance {
-				bestDistance = normalizedDistance
-				bestKeySize = keySize
+	for i, j := range one {
+		nb := two[i]
+		for k := 1; k < 129; k = 2 * k {
+			if (j & byte(k)) != (nb & byte(k)) {
+				diff++
 			}
-		*/
+		}
+	}
+
+	return diff
+}
+
+func findKeySize(data []byte) int {
+	keySizes := make([]Keysize, 39)
+
+	for ks := 2; ks < 41; ks++ {
+		avgDist := 0.0
+		iter := 0.0
+
+		for i := 0; i+2*ks < len(data); i += ks {
+			lb, ub := data[i:i+ks], data[i+ks:i+2*ks]
+			avgDist += float64(hamDis(lb, ub)) / float64(ks)
+			iter++
+		}
+
+		nhd := avgDist / iter
+		keySizes[ks-2] = Keysize{ks, nhd}
 	}
 
 	sort.Slice(keySizes, func(i, j int) bool { return keySizes[i].hd < keySizes[j].hd })
@@ -53,8 +71,8 @@ func chunkify(data []byte, size int) [][]byte {
 	var chunk [][]byte
 
 	for i := 0; i < len(data); i += size {
-
 		end := i + size
+
 		if end > len(data) {
 			end = len(data)
 		}
@@ -81,7 +99,7 @@ func computeKey(data []byte, key int) ([]byte, []byte) {
 
 	keys := make([]byte, key)
 	for i, tbl := range transpose {
-		k, _, _ := util.FindXOR(string(tbl))
+		k, _, _ := util.FindXOR(tbl)
 		keys[i] = k
 	}
 
@@ -89,44 +107,27 @@ func computeKey(data []byte, key int) ([]byte, []byte) {
 	return dec, keys
 }
 
-func hamDis(one []byte, two []byte) int { // to util
-	oneLen := len(one)
-	twoLen := len(two)
-	diff := 0
-
-	if oneLen != twoLen {
-		panic("Inputs of different lengths")
-	}
-
-	for i, j := range one {
-		nb := two[i]
-		for k := 1; k < 129; k = 2 * k {
-			if (j & byte(k)) != (nb & byte(k)) {
-				diff++
-			}
-		}
-	}
-
-	return diff
-}
-
 func main() {
-	one := "this is a test"
-	two := "wokka wokka!!!"
+	/*
+		one := "this is a test"
+		two := "wokka wokka!!!"
 
-	hamming := hamDis([]byte(one), []byte(two))
-	fmt.Println(hamming)
+		hamming := hamDis([]byte(one), []byte(two))
+		fmt.Println(hamming)
+	*/
 
 	data, err := os.ReadFile("data.txt")
 	if err != nil {
 		panic(err)
 	}
 
-	keysize := findKeySize(data)
+	ddata := util.DecodeB64(string(data))
+	keysize := findKeySize(ddata)
+
 	fmt.Println(keysize)
 
-	// keySize := findKeySize(data)
-	dec, _ := computeKey(data, 29)
+	text, key := computeKey(ddata, keysize)
 
-	fmt.Println(string(dec))
+	fmt.Println(string(text))
+	fmt.Println("Key: ", string(key))
 }
