@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"crypto-pals/util"
+	"fmt"
 	"os"
 )
 
@@ -34,6 +35,8 @@ func main() {
 	for line := 0; scanner.Scan(); line++ {
 		text := scanner.Text()
 		_, score := detectECB(util.DecodeHex(text), 16)
+
+		fmt.Println(score)
 	}
 
 	defer data.Close()
