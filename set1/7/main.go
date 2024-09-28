@@ -7,10 +7,6 @@ import (
 	"os"
 )
 
-func UnPKCS7(pt []byte) []byte {
-	return pt[:len(pt)-int(pt[len(pt)-1])]
-}
-
 func aesDecrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 
@@ -26,7 +22,7 @@ func aesDecrypt(data, key []byte) []byte {
 		cipher.Decrypt(decrypted[i*size:(i+1)*size], chunk)
 	}
 
-	return UnPKCS7(decrypted)
+	return decrypted
 }
 
 func main() {

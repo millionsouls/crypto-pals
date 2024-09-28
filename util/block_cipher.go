@@ -13,11 +13,10 @@ func Chunkify(data []byte, size int) [][]byte {
 		if end > len(data) {
 			end = len(data)
 		}
-		nChunk := make([]byte, len(data[i:end]))
 
-		copy(nChunk, data[i:end])
-
-		chunk = append(chunk, nChunk)
+		cchunk := make([]byte, len(data[i:end]))
+		copy(cchunk, data[i:end])
+		chunk = append(chunk, cchunk)
 	}
 
 	return chunk
