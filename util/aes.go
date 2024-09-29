@@ -21,3 +21,23 @@ func AESDecrypt(data, key []byte) []byte {
 
 	return decrypted
 }
+
+func AESCBCDecrypt(data []byte, key []byte, iv []byte) []byte {
+	cipher, err := aes.NewCipher(key)
+
+	if err != nil {
+		panic(err)
+	}
+
+	size := cipher.BlockSize()
+	chunks := Chunkify(data, size)
+	decrypted := make([]byte, len(data))
+	lastchunk := iv
+
+	for _, chunk := range chunks {
+
+		lastchunk = chunk
+	}
+
+	return decrypted
+}
