@@ -1,5 +1,6 @@
 package main
 
+// Find AES ECB
 import (
 	"bufio"
 	"crypto-pals/util"
@@ -26,6 +27,9 @@ func detectECB(data []byte, size int) (map[string]int, float64) {
 
 func main() {
 	data, err := os.Open("data.txt")
+	var bestText []byte
+	bestLine := 0
+	bestScore := 0.0
 
 	if err != nil {
 		panic(err)
@@ -36,8 +40,16 @@ func main() {
 		text := scanner.Text()
 		_, score := detectECB(util.DecodeHex(text), 16)
 
-		fmt.Println(score)
+		if score > bestScore {
+			bestText = []byte(text)
+			bestLine = line
+			bestScore = score
+		}
 	}
+
+	fmt.Printf("Line: %d\n", bestLine)
+	fmt.Printf("Score: %.2f\n", bestScore)
+	fmt.Println(string(bestText))
 
 	defer data.Close()
 }

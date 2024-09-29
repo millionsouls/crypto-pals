@@ -2,7 +2,7 @@ package util
 
 func Chunkify(data []byte, size int) [][]byte {
 	if size < 1 {
-		panic("Invalid chunksize")
+		panic("Chunkify: Invalid chunksize")
 	}
 
 	var chunk [][]byte
@@ -20,4 +20,32 @@ func Chunkify(data []byte, size int) [][]byte {
 	}
 
 	return chunk
+}
+
+func PKCS7(data []byte, size int) []byte {
+	var padLen int
+
+	if len(data) > size {
+		panic("PKCS7: Data greater than block size")
+	}
+
+	if size == 16 {
+		padLen = size - (len(data) & 15)
+	} else {
+		padLen = size - (len(data) % size)
+	}
+
+	padding := make([]byte, padLen)
+
+	for i := range padding {
+		padding[i] = byte(padLen)
+	}
+
+	result := append(data, padding...)
+
+	return result
+}
+
+func UnPad(data []byte) []byte {
+	return data[:len(data)-int(data[len(data)-1])]
 }

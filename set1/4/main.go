@@ -1,5 +1,6 @@
 package main
 
+// Detect single XOR
 import (
 	"bufio"
 	"fmt"

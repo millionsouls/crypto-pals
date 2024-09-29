@@ -1,5 +1,6 @@
 package main
 
+// XOR two strings
 import (
 	"crypto-pals/util"
 	"encoding/hex"

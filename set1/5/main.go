@@ -1,5 +1,6 @@
 package main
 
+// Repeating-key XOR
 import (
 	"crypto-pals/util"
 	"encoding/hex"

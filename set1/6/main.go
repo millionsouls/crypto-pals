@@ -1,5 +1,6 @@
 package main
 
+// Breaking repeating-key XOR
 import (
 	"fmt"
 	"os"

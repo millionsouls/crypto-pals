@@ -1,5 +1,6 @@
 package main
 
+// Single-Byte XOR
 import (
 	"fmt"
 	"math"

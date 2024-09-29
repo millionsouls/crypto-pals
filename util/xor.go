@@ -71,6 +71,7 @@ func ChiSquaredScore(text []byte) float64 {
 	return score
 }
 
+// for whoever is reading this: i hate stats
 func NewChiSquared(inp []byte) (float64, float64) {
 	counts := make([]int, 256)
 	for _, b := range inp {

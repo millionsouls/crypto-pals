@@ -48,7 +48,7 @@ func HamDis(one []byte, two []byte) int {
 	diff := 0
 
 	if oneLen != twoLen {
-		panic("Inputs of different lengths")
+		panic("Hamming: Inputs of different lengths")
 	}
 
 	for i, j := range one {

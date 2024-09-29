@@ -1,5 +1,6 @@
 package main
 
+// Hex to Base64
 import (
 	"encoding/base64"
 	"encoding/hex"

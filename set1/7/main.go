@@ -1,5 +1,6 @@
 package main
 
+// AES ECB decryption
 import (
 	"crypto-pals/util"
 	"crypto/aes"
