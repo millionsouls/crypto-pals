@@ -31,11 +31,13 @@ func AESCBCDecrypt(data []byte, key []byte, iv []byte) []byte {
 
 	size := cipher.BlockSize()
 	chunks := Chunkify(data, size)
-	decrypted := make([]byte, len(data))
+	var decrypted []byte
 	lastchunk := iv
 
 	for _, chunk := range chunks {
-
+		decChunk := make([]byte, size)
+		cipher.Decrypt(decChunk, chunk)
+		decrypted = append(decrypted, RXor(lastchunk, decChunk)...)
 		lastchunk = chunk
 	}
 
