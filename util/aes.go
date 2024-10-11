@@ -38,7 +38,7 @@ func AESEncrypt(data, key []byte) []byte {
 		cipher.Encrypt(encrypted[i*size:(i+1)*size], chunk)
 	}
 
-	fmt.Println(encrypted)
+	//fmt.Println(encrypted)
 	fmt.Println(string(AESDecrypt(encrypted, key)))
 
 	return encrypted
@@ -73,22 +73,19 @@ func AESCBCEncrypt(data, key, iv []byte) []byte {
 	}
 
 	size := cipher.BlockSize()
-
-	data = PKCS7(data, size)
+	//data = PKCS7(data, len(key))
 	chunks := Chunkify(data, size)
-
-	//chunks := Chunkify(data, size)
-	//chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], len(key)))
+	chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], len(key)))
 
 	encrypted := make([]byte, len(chunks)*size)
 
 	lastChunk := iv
 	for i, chunk := range chunks {
-		cipher.Encrypt(encrypted[i*size:(i+1)*size], RXor(chunk, lastChunk))
+		cipher.Encrypt(encrypted[i*size:(i+1)*size], RXor(lastChunk, chunk))
 		lastChunk = encrypted[i*size : (i+1)*size]
 	}
 
-	fmt.Println(encrypted)
-	fmt.Println(AESCBCDecrypt(encrypted, key, []byte("\x00")))
+	//fmt.Println(encrypted)
+	fmt.Println(string(AESCBCDecrypt(encrypted, key, []byte("\x00"))))
 	return encrypted
 }
