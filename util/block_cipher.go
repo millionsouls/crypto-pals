@@ -5,21 +5,31 @@ func Chunkify(data []byte, size int) [][]byte {
 		panic("Chunkify: Invalid chunksize")
 	}
 
-	var chunk [][]byte
+	var chunks [][]byte
+
+	/*
+		for i := 0; i < len(data); i += size {
+			end := i + size
+
+			if end > len(data) {
+				end = len(data)
+			}
+
+			cchunk := make([]byte, len(data[i:end]))
+			copy(cchunk, data[i:end])
+			chunk = append(chunk, cchunk)
+		}
+	*/
 
 	for i := 0; i < len(data); i += size {
 		end := i + size
-
 		if end > len(data) {
 			end = len(data)
 		}
-
-		cchunk := make([]byte, len(data[i:end]))
-		copy(cchunk, data[i:end])
-		chunk = append(chunk, cchunk)
+		chunks = append(chunks, data[i:end])
 	}
 
-	return chunk
+	return chunks
 }
 
 func PKCS7(data []byte, size int) []byte {

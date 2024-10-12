@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/rand"
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -61,4 +62,15 @@ func HamDis(one []byte, two []byte) int {
 	}
 
 	return diff
+}
+
+func GenerateRandomBytes(n int) []byte {
+	b := make([]byte, n)
+	_, err := rand.Read(b)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return b
 }

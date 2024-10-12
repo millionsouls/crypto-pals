@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
+	"os"
 )
 
 func GenerateRandomBytes(n int) []byte {
@@ -18,7 +19,7 @@ func GenerateRandomBytes(n int) []byte {
 	return b
 }
 
-func encryptionOracle(input []byte) []byte {
+func encryptionOracle(input []byte) ([]byte, []byte) {
 	var out []byte
 	choice, err := rand.Int(rand.Reader, big.NewInt(2))
 	key := GenerateRandomBytes(16)
@@ -36,10 +37,25 @@ func encryptionOracle(input []byte) []byte {
 		out = util.AESCBCEncrypt(input, key, []byte("\x00"))
 	}
 
-	return out
+	return out, key
 }
 
 func main() {
-	text := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-	encryptionOracle([]byte(text))
+	//text := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+	text, err := os.ReadFile("data.txt")
+
+	if err != nil {
+		panic(err)
+	}
+
+	encrypted, key := encryptionOracle(text)
+	test := util.DetectECB(encrypted, len(key))
+
+	if test {
+		fmt.Println("Is ECB")
+		fmt.Println(string(util.AESDecrypt(encrypted, key)))
+	} else {
+		fmt.Println("Is CBC")
+		fmt.Println(string(util.AESCBCDecrypt(encrypted, key, []byte("\x00"))))
+	}
 }

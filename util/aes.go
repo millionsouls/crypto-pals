@@ -2,8 +2,26 @@ package util
 
 import (
 	"crypto/aes"
-	"fmt"
 )
+
+func DetectECB(data []byte, size int) bool {
+	chunks := Chunkify(data, size)
+	//chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], size))
+
+	chunkFreq := make(map[string]int)
+	// repeats := 0
+
+	for _, chunk := range chunks {
+		chunkStr := string(chunk)
+		chunkFreq[chunkStr]++
+		if chunkFreq[chunkStr] > 1 {
+			// If any chunk appears more than once, it's likely ECB.
+			return true
+		}
+	}
+
+	return false
+}
 
 func AESDecrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
@@ -39,7 +57,7 @@ func AESEncrypt(data, key []byte) []byte {
 	}
 
 	//fmt.Println(encrypted)
-	fmt.Println(string(AESDecrypt(encrypted, key)))
+	//fmt.Println(string(AESDecrypt(encrypted, key)))
 
 	return encrypted
 }
@@ -86,6 +104,7 @@ func AESCBCEncrypt(data, key, iv []byte) []byte {
 	}
 
 	//fmt.Println(encrypted)
-	fmt.Println(string(AESCBCDecrypt(encrypted, key, []byte("\x00"))))
+	//fmt.Println(string(AESCBCDecrypt(encrypted, key, []byte("\x00"))))
+
 	return encrypted
 }
