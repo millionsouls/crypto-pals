@@ -7,26 +7,16 @@ func Chunkify(data []byte, size int) [][]byte {
 
 	var chunks [][]byte
 
-	/*
-		for i := 0; i < len(data); i += size {
-			end := i + size
-
-			if end > len(data) {
-				end = len(data)
-			}
-
-			cchunk := make([]byte, len(data[i:end]))
-			copy(cchunk, data[i:end])
-			chunk = append(chunk, cchunk)
-		}
-	*/
-
 	for i := 0; i < len(data); i += size {
 		end := i + size
+
 		if end > len(data) {
 			end = len(data)
 		}
-		chunks = append(chunks, data[i:end])
+
+		cchunk := make([]byte, len(data[i:end]))
+		copy(cchunk, data[i:end])
+		chunks = append(chunks, cchunk)
 	}
 
 	return chunks
