@@ -88,6 +88,5 @@ func main() {
 	}
 
 	fmt.Println("Finding the key")
-
 	findKey(size)
 }
