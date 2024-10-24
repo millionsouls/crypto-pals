@@ -60,7 +60,7 @@ func aes(str string, key []byte) []byte {
 	prof := createProfile(str)
 	kvProf := kvEncode(prof)
 
-	return util.AESEncrypt([]byte(kvProf), key)
+	return util.AESECBEncrypt([]byte(kvProf), key)
 }
 
 func main() {
@@ -84,7 +84,7 @@ func main() {
 	aesProfile := aes(user, key)
 
 	fmt.Println("\nEncoder tests:")
-	dProfile := util.AESDecrypt(aesProfile, key)
+	dProfile := util.AESECBDecrypt(aesProfile, key)
 	fmt.Println(string(dProfile))
 	fmt.Println(kvParse(string(dProfile)))
 
@@ -93,7 +93,7 @@ func main() {
 	aProfile := aes("user@gmail.comadmin", key)
 
 	encode := append(uProfile[:32], aProfile[16:32]...)
-	decoded := string(util.AESDecrypt(encode, key))
+	decoded := string(util.AESECBDecrypt(encode, key))
 
 	fmt.Println(decoded)
 	fmt.Println(kvParse(decoded))

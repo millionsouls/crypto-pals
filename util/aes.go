@@ -25,7 +25,7 @@ func DetectECB(data []byte, size int) bool {
 	return false
 }
 
-func AESDecrypt(data, key []byte) []byte {
+func AESECBDecrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 
 	if err != nil {
@@ -43,7 +43,7 @@ func AESDecrypt(data, key []byte) []byte {
 	return decrypted
 }
 
-func AESEncrypt(data, key []byte) []byte {
+func AESECBEncrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
