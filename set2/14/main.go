@@ -54,4 +54,7 @@ func main() {
 	fmt.Println("Finding key size")
 	findKeySize()
 
+	isECB := util.DetectECB(encrypted, len(key))
+	fmt.Println(isECB)
+
 }

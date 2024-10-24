@@ -1,5 +1,10 @@
 package util
 
+// help functions for block ciphers
+// chunkify - chunks a byte slice in 2x2 # sized blocks
+// pkcs7 - pads any blocks that are not # size
+// 			includes removal of pad
+
 func Chunkify(data []byte, size int) [][]byte {
 	if size < 1 {
 		panic("Chunkify: Invalid chunksize")

@@ -1,5 +1,7 @@
 package util
 
+// other misc helper functions
+
 import (
 	"crypto/rand"
 	"encoding/base64"

@@ -1,5 +1,8 @@
 package util
 
+// functions for AES cipher suite; ECB, CBC
+// detectecb - finds any repeat cipher blocks which usually comes from ECB methods
+
 import (
 	"crypto/aes"
 )

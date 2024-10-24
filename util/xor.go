@@ -1,5 +1,8 @@
 package util
 
+// helper functions for XOR operations
+// chi squred methods for frequency analysis
+
 import (
 	"math"
 	"unicode"
