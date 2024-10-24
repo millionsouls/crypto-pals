@@ -6,7 +6,7 @@ import (
 
 func DetectECB(data []byte, size int) bool {
 	chunks := Chunkify(data, size)
-	//chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], size))
+	// chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], size))
 
 	chunkFreq := make(map[string]int)
 	// repeats := 0
@@ -15,7 +15,6 @@ func DetectECB(data []byte, size int) bool {
 		chunkStr := string(chunk)
 		chunkFreq[chunkStr]++
 		if chunkFreq[chunkStr] > 1 {
-			// If any chunk appears more than once, it's likely ECB.
 			return true
 		}
 	}
