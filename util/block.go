@@ -1,5 +1,7 @@
 package util
 
+import "strings"
+
 // help functions for block ciphers
 // chunkify - chunks a byte slice in 2x2 # sized blocks
 // pkcs7 - pads any blocks that are not # size
@@ -53,4 +55,20 @@ func PKCS7(data []byte, size int) []byte {
 
 func UnPad(data []byte) []byte {
 	return data[:len(data)-int(data[len(data)-1])]
+}
+
+func DetectPad(str string, size int) bool {
+	if len(str)%size != 0 {
+		panic("String is not a multiple of the size")
+	}
+
+	sLen := len(str)
+	lastByte := str[sLen-1]
+	trim := strings.TrimRight(str, string(lastByte))
+
+	if sLen-len(trim) != int(lastByte) {
+		return false
+	}
+
+	return true
 }
