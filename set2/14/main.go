@@ -1,5 +1,6 @@
 package main
 
+// Byte at a time ECB decryption
 import (
 	"bytes"
 	"crypto-pals/util"

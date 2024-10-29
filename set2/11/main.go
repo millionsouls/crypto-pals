@@ -1,5 +1,6 @@
 package main
 
+//ECB/CBC detection oracle
 import (
 	"crypto-pals/util"
 	"crypto/rand"

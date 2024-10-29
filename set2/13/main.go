@@ -1,5 +1,6 @@
 package main
 
+//ECB cut and paste
 import (
 	"crypto-pals/util"
 	"fmt"
