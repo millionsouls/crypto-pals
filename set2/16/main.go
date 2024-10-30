@@ -52,7 +52,7 @@ func make_admin() []byte {
 
 	// fmt.Println(isAdmin(ct))
 
-	flip := util.RXor(block, append([]byte(";admin=true"), bytes.Repeat([]byte("A"), 16-len(";admin=true"))...))
+	flip := util.RXor(block, append([]byte(";admin=true;"), bytes.Repeat([]byte("A"), 16-len(";admin=true"))...))
 	pad := append(flip, bytes.Repeat([]byte("\x00"), 16*3-len(flip))...)
 	pad = append(pad, bytes.Repeat([]byte("\x00"), len(ct)-len(pad))...)
 	new_ct := util.RXor(ct, pad)
