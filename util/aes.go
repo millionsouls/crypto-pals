@@ -5,6 +5,8 @@ package util
 
 import (
 	"crypto/aes"
+	"crypto/cipher"
+	"encoding/binary"
 )
 
 func DetectECB(data []byte, size int) bool {
@@ -25,7 +27,7 @@ func DetectECB(data []byte, size int) bool {
 	return false
 }
 
-func AESECBDecrypt(data, key []byte) []byte {
+func AES_ECB_Decrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 
 	if err != nil {
@@ -43,7 +45,7 @@ func AESECBDecrypt(data, key []byte) []byte {
 	return decrypted
 }
 
-func AESECBEncrypt(data, key []byte) []byte {
+func AES_ECB_Encrypt(data, key []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -64,7 +66,7 @@ func AESECBEncrypt(data, key []byte) []byte {
 	return encrypted
 }
 
-func AESCBCDecrypt(data []byte, key []byte, iv []byte) []byte {
+func AES_CBC_Decrypt(data []byte, key []byte, iv []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 
 	if err != nil {
@@ -86,7 +88,7 @@ func AESCBCDecrypt(data []byte, key []byte, iv []byte) []byte {
 	return decrypted
 }
 
-func AESCBCEncrypt(data, key, iv []byte) []byte {
+func AES_CBC_Encrypt(data, key, iv []byte) []byte {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
 		panic(err)
@@ -109,4 +111,22 @@ func AESCBCEncrypt(data, key, iv []byte) []byte {
 	//fmt.Println(string(AESCBCDecrypt(encrypted, key, []byte("\x00"))))
 
 	return encrypted
+}
+
+func AES_CTR_Decrypt(pt, key []byte, nonce uint64) []byte {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err)
+	}
+
+	nonceBytes := make([]byte, 8)
+	binary.LittleEndian.PutUint64(nonceBytes, nonce)
+	iv := append(nonceBytes, make([]byte, 8)...)
+
+	stream := cipher.NewCTR(block, iv)
+
+	ciphertext := make([]byte, len(pt))
+	stream.XORKeyStream(ciphertext, []byte(pt))
+
+	return ciphertext
 }
