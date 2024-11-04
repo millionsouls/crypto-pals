@@ -121,12 +121,18 @@ func AES_CTR_Decrypt(pt, key []byte, nonce uint64) []byte {
 
 	nonceBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(nonceBytes, nonce)
-	iv := append(nonceBytes, make([]byte, 8)...)
 
-	stream := cipher.NewCTR(block, iv)
+	plaintext := make([]byte, len(pt))
 
-	ciphertext := make([]byte, len(pt))
-	stream.XORKeyStream(ciphertext, []byte(pt))
+	for i := 0; i < len(pt); i += aes.BlockSize {
+		//create a new iv for each block
+		iv := append(nonceBytes, make([]byte, 8)...)                   // 8 bytes for the nonce and 8 for the counter
+		binary.LittleEndian.PutUint64(iv[8:], uint64(i/aes.BlockSize)) // set the counter
 
-	return ciphertext
+		//initialize ctr for this block only
+		stream := cipher.NewCTR(block, iv)
+		stream.XORKeyStream(plaintext[i:], pt[i:])
+	}
+
+	return plaintext
 }
