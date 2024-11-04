@@ -16,7 +16,7 @@ func main() {
 		panic(err)
 	}
 
-	text := util.AESCBCDecrypt(util.DecodeB64(string(data)), key, iv)
+	text := util.AES_CBC_Decrypt(util.DecodeB64(string(data)), key, iv)
 
 	fmt.Println(string(text))
 }

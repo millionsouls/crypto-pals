@@ -32,10 +32,10 @@ func encryptionOracle(input []byte) ([]byte, []byte) {
 	switch choice.Int64() {
 	case 0:
 		fmt.Println("Using ECB")
-		out = util.AESECBEncrypt(input, key)
+		out = util.AES_ECB_Encrypt(input, key)
 	case 1:
 		fmt.Println("Using CBC")
-		out = util.AESCBCEncrypt(input, key, []byte("\x00"))
+		out = util.AES_CBC_Encrypt(input, key, []byte("\x00"))
 	}
 
 	return out, key
@@ -54,9 +54,9 @@ func main() {
 
 	if test {
 		fmt.Println("Is ECB")
-		fmt.Println(string(util.AESECBDecrypt(encrypted, key)))
+		fmt.Println(string(util.AES_ECB_Decrypt(encrypted, key)))
 	} else {
 		fmt.Println("Is CBC")
-		fmt.Println(string(util.AESCBCDecrypt(encrypted, key, []byte("\x00"))))
+		fmt.Println(string(util.AES_CBC_Decrypt(encrypted, key, []byte("\x00"))))
 	}
 }

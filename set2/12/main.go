@@ -12,7 +12,7 @@ var key []byte
 var mText []byte
 
 func theOracle(input []byte) []byte {
-	return util.AESECBEncrypt(input, key)
+	return util.AES_ECB_Encrypt(input, key)
 }
 
 func findKeySize() int {

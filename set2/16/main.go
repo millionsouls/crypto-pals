@@ -23,11 +23,11 @@ func wrap_data(input []byte) []byte {
 	text = append(prefix, text...)
 	text = append(text, suffix...)
 
-	return util.AESCBCEncrypt(text, key, iv)
+	return util.AES_CBC_Encrypt(text, key, iv)
 }
 
 func isAdmin(input []byte) bool {
-	dec := util.AESCBCDecrypt(input, key, iv)
+	dec := util.AES_CBC_Decrypt(input, key, iv)
 	splits := strings.Split(string(dec), ";")
 	result := make(map[string]string)
 
