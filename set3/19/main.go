@@ -1,69 +1,62 @@
 package main
 
 import (
+	"bytes"
 	"crypto-pals/util"
-	"crypto/aes"
-	"crypto/cipher"
-	"encoding/binary"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 )
 
 var key []byte
 
-func dec_ctr(pt, key []byte, nonce uint64) []byte {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
+func enc(strArray []string) [][]byte {
+	bArrArr := make([][]byte, len(strArray))
+
+	for i, val := range strArray {
+		enc := util.AES_CTR_Encrypt(util.DecodeB64(val), key, bytes.Repeat([]byte("\x00"), 8))
+		bArrArr[i] = enc
 	}
 
-	nonceBytes := make([]byte, 8)
-	binary.LittleEndian.PutUint64(nonceBytes, nonce)
-	plaintext := make([]byte, len(pt))
+	sort.Slice(bArrArr, func(i, j int) bool { return len(bArrArr[i]) < len(bArrArr[j]) })
 
-	for i := 0; i < len(pt); i += aes.BlockSize {
-		iv := append(make([]byte, 8), nonceBytes...)
-		binary.LittleEndian.PutUint64(iv[8:], uint64(i/aes.BlockSize)) // set the counter
-
-		//initialize ctr for this block only
-		stream := cipher.NewCTR(block, iv)
-		stream.XORKeyStream(plaintext[i:], pt[i:])
-	}
-
-	return plaintext
+	return bArrArr
 }
 
-func enc_ctr(pt, key []byte, nonce uint64) []byte {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
+func dec(enc [][]byte) ([]string, []byte) {
+	var trunc []byte
+	min := len(enc[0])
+
+	for _, v := range enc {
+		trunc = append(trunc, v[:min]...)
 	}
 
-	nonceBytes := make([]byte, 16)
-	binary.LittleEndian.PutUint64(nonceBytes, nonce)
-	plaintext := make([]byte, len(pt))
+	dec, keyStream := util.ComputeKey(trunc, util.FindKeySize(trunc))
+	split := make([]string, len(enc))
 
-	stream := cipher.NewCTR(block, nonceBytes)
-	ciphertext := make([]byte, len(plaintext))
-	stream.XORKeyStream(ciphertext, plaintext)
+	start := 0
+	end := min
 
-	return append(nonceBytes, ciphertext...)
+	for i := 0; i < len(enc); i++ {
+		split[i] = string(dec[start:end])
+		start = end
+		end = start + min
+	}
+
+	return split, keyStream
 }
 
 func main() {
 	key = util.GenerateRandomBytes(16)
-	nonce := 0
+	// nonce := 0
 
 	data, _ := os.ReadFile("data.txt")
 	strArray := strings.Split(string(data), "\n")
 
-	for _, i := range strArray {
-		// fmt.Println(string(util.DecodeB64(i)))
-		enc := enc_ctr(util.DecodeB64(i), key, uint64(nonce))
-		dec := dec_ctr(enc, key, uint64(nonce))
+	enc := enc(strArray)
+	dec, keys := dec(enc)
 
-		fmt.Println(string(dec))
-	}
-
+	fmt.Println(string(keys))
+	fmt.Println(strings.Join(dec, "\n"))
 }
