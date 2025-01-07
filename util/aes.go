@@ -7,6 +7,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/binary"
+	"strings"
+	"sync"
 )
 
 func DetectECB(data []byte, size int) bool {
@@ -135,4 +137,36 @@ func AES_CTR_Decrypt(pt, key []byte, nonce uint64) []byte {
 	}
 
 	return plaintext
+}
+
+func AES_CTR_Encrypt(pt, key, nonce []byte) []byte {
+	ciph, err := aes.NewCipher(key)
+	if err != nil {
+		return nil
+	}
+
+	size := ciph.BlockSize()
+	if len(nonce) != size/2 {
+		return nil
+	}
+	chunkEnc := Chunkify(pt, size)
+	chunkDec := make([]string, len(chunkEnc))
+
+	var wg sync.WaitGroup
+	wg.Add(len(chunkEnc))
+
+	for ctr := 0; ctr < len(chunkEnc); ctr++ {
+		go func(lCtr int64, chunk []byte) {
+			defer wg.Done()
+			b := make([]byte, 8)
+			binary.LittleEndian.PutUint64(b, uint64(lCtr))
+			conc := append(nonce, b...)
+			ks := AES_ECB_Encrypt(conc, key)
+			chunkDec[lCtr] = string(RXor(chunk, ks))
+		}(int64(ctr), chunkEnc[ctr])
+	}
+
+	wg.Wait()
+
+	return []byte(strings.Join(chunkDec, ""))
 }

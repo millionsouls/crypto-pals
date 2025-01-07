@@ -5,12 +5,19 @@ package util
 
 import (
 	"math"
+	"sort"
 	"unicode"
 
 	"gonum.org/v1/gonum/stat"
 	"gonum.org/v1/gonum/stat/distuv"
 )
 
+type Keysize struct {
+	size int
+	hd   float64
+}
+
+// DO NOT USE
 var FreqTable = map[rune]float64{
 	'a': 0.0817, 'b': 0.0149, 'c': 0.0278, 'd': 0.0425, 'e': 0.1270,
 	'f': 0.0223, 'g': 0.0202, 'h': 0.0609, 'i': 0.0697, 'j': 0.0015,
@@ -74,7 +81,7 @@ func ChiSquaredScore(text []byte) float64 {
 	return score
 }
 
-// for whoever is reading this: i hate stats
+// i hate stats
 func NewChiSquared(inp []byte) (float64, float64) {
 	counts := make([]int, 256)
 	for _, b := range inp {
@@ -167,4 +174,46 @@ func FindXOR(data []byte) (byte, string, float64) {
 	*/
 
 	return bestChar, string(bestResult), bestScore
+}
+
+func FindKeySize(data []byte) int {
+	keySizes := make([]Keysize, 39)
+
+	for ks := 2; ks < 41; ks++ {
+		avgDist := 0.0
+		iter := 0.0
+
+		for i := 0; i+2*ks < len(data); i += ks {
+			lb, ub := data[i:i+ks], data[i+ks:i+2*ks]
+			avgDist += float64(HamDis(lb, ub)) / float64(ks)
+			iter++
+		}
+
+		nhd := avgDist / iter
+		keySizes[ks-2] = Keysize{ks, nhd}
+	}
+
+	sort.Slice(keySizes, func(i, j int) bool { return keySizes[i].hd < keySizes[j].hd })
+
+	return keySizes[0].size
+}
+
+func ComputeKey(data []byte, key int) ([]byte, []byte) {
+	chunks := Chunkify(data, key)
+	transpose := make([][]byte, key)
+
+	for i := 0; i < len(chunks); i++ {
+		for j := 0; j < len(chunks[i]); j++ {
+			transpose[j] = append(transpose[j], chunks[i][j])
+		}
+	}
+
+	keys := make([]byte, key)
+	for i, tbl := range transpose {
+		k, _, _ := FindXOR(tbl)
+		keys[i] = k
+	}
+
+	dec := RXor(keys, data) //
+	return dec, keys
 }
