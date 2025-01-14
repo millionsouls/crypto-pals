@@ -13,7 +13,7 @@ func main() {
 
 	nonce := uint64(0)
 	enc := util.DecodeB64(text)
-	dec := crysuite.AES_CTR_Decrypt(enc, []byte(key), nonce)
+	dec, _ := crysuite.DecryptAES_CTR(enc, []byte(key), nonce)
 
 	fmt.Println(string(dec))
 }

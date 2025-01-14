@@ -1,24 +1,20 @@
 package crysuite
 
-// functions for AES cipher suite; ECB, CBC
-// detectecb - finds any repeat cipher blocks which usually comes from ECB methods
-
 import (
-	"crypto-pals/util"
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/binary"
+	"errors"
 	"strings"
-	"sync"
+
+	"crypto-pals/util"
 )
 
-func DetectECB(data []byte, size int) bool {
-	chunks := util.Chunkify(data, size)
-	// chunks = append(chunks[:len(chunks)-1], PKCS7(chunks[len(chunks)-1], size))
+// DetectECB checks if a ciphertext uses ECB mode by finding repeating blocks
+func DetectECB(data []byte, blockSize int) bool {
+	chunks := util.Chunkify(data, blockSize)
 
 	chunkFreq := make(map[string]int)
-	// repeats := 0
-
 	for _, chunk := range chunks {
 		chunkStr := string(chunk)
 		chunkFreq[chunkStr]++
@@ -30,144 +26,169 @@ func DetectECB(data []byte, size int) bool {
 	return false
 }
 
-func AES_ECB_Decrypt(data, key []byte) []byte {
+// DecryptAES_ECB decrypts the given data using AES in ECB mode
+func DecryptAES_ECB(data, key []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
-
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	decrypted := make([]byte, len(data))
 	size := cipher.BlockSize()
 	chunks := util.Chunkify(data, size)
 
+	decrypted := make([]byte, len(data))
 	for i, chunk := range chunks {
 		cipher.Decrypt(decrypted[i*size:(i+1)*size], chunk)
 	}
 
-	return decrypted
+	return decrypted, nil
 }
 
-func AES_ECB_Encrypt(data, key []byte) []byte {
+// EncryptAES_ECB encrypts the given data using AES in ECB mode
+func EncryptAES_ECB(data, key []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	size := cipher.BlockSize()
 	chunks := util.Chunkify(data, size)
-	chunks = append(chunks[:len(chunks)-1], util.PKCS7(chunks[len(chunks)-1], len(key)))
-	encrypted := make([]byte, len(chunks)*size)
 
+	// Apply PKCS7 padding to the last chunk
+	if len(chunks) > 0 {
+		chunks[len(chunks)-1] = util.PKCS7(chunks[len(chunks)-1], len(key))
+	}
+
+	encrypted := make([]byte, len(data))
 	for i, chunk := range chunks {
 		cipher.Encrypt(encrypted[i*size:(i+1)*size], chunk)
 	}
 
-	//fmt.Println(encrypted)
-	//fmt.Println(string(AESDecrypt(encrypted, key)))
-
-	return encrypted
+	return encrypted, nil
 }
 
-func AES_CBC_Decrypt(data []byte, key []byte, iv []byte) []byte {
+// DecryptAES_CBC decrypts the given data using AES in CBC mode
+func DecryptAES_CBC(data, key, iv []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
-
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	size := cipher.BlockSize()
-	chunks := util.Chunkify(data, size)
 	var decrypted []byte
-	lastchunk := iv
+	size := cipher.BlockSize()
+	chunks := util.Chunkify(data[size:], size)
+	iiv := iv
+	if len(iv) == 0 {
+		iiv = data[:size]
+	}
 
 	for _, chunk := range chunks {
 		decChunk := make([]byte, size)
 		cipher.Decrypt(decChunk, chunk)
-		decrypted = append(decrypted, util.RXor(lastchunk, decChunk)...)
-		lastchunk = chunk
+		xoredChunk, err := util.Xor(iiv, decChunk)
+		if err != nil {
+			return nil, err
+		}
+		decrypted = append(decrypted, xoredChunk...)
+		iiv = chunk
 	}
 
-	return decrypted
+	// Remove padding
+	padding := int(decrypted[len(decrypted)-1])
+	return decrypted[:len(decrypted)-padding], nil
 }
 
-func AES_CBC_Encrypt(data, key, iv []byte) []byte {
+// EncryptAES_CBC encrypts the given data using AES in CBC mode
+func EncryptAES_CBC(data, key, iv []byte) ([]byte, error) {
 	cipher, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	size := cipher.BlockSize()
-	//data = PKCS7(data, len(key))
 	chunks := util.Chunkify(data, size)
-	chunks = append(chunks[:len(chunks)-1], util.PKCS7(chunks[len(chunks)-1], len(key)))
-
+	chunks[len(chunks)-1] = util.PKCS7(chunks[len(chunks)-1], size)
 	encrypted := make([]byte, len(chunks)*size)
-
 	lastChunk := iv
+
+	if len(iv) == 0 {
+		iv = make([]byte, size)
+		lastChunk = iv
+	}
+
+	// Loop through each chunk and encrypt it
 	for i, chunk := range chunks {
-		cipher.Encrypt(encrypted[i*size:(i+1)*size], util.RXor(lastChunk, chunk))
+		for j := 0; j < size; j++ {
+			chunk[j] ^= lastChunk[j]
+		}
+
+		// Encrypt the XORed chunk
+		cipher.Encrypt(encrypted[i*size:(i+1)*size], chunk)
+
+		// Update lastChunk for the next block (current ciphertext)
 		lastChunk = encrypted[i*size : (i+1)*size]
 	}
 
-	//fmt.Println(encrypted)
-	//fmt.Println(string(AESCBCDecrypt(encrypted, key, []byte("\x00"))))
-
-	return encrypted
+	return append(iv, encrypted...), nil
 }
 
-func AES_CTR_Decrypt(pt, key []byte, nonce uint64) []byte {
-	block, err := aes.NewCipher(key)
+// DecryptAES_CTR decrypts the given data using AES in CTR mode
+func DecryptAES_CTR(data, key []byte, nonce uint64) ([]byte, error) {
+	cipherBlock, err := aes.NewCipher(key)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	nonceBytes := make([]byte, 8)
 	binary.LittleEndian.PutUint64(nonceBytes, nonce)
 
-	plaintext := make([]byte, len(pt))
+	plaintext := make([]byte, len(data))
+	for i := 0; i < len(data); i += aes.BlockSize {
+		// Create a new IV for this block: nonce + counter
+		iv := append(nonceBytes, make([]byte, 8)...)                   // 8 bytes for nonce and counter
+		binary.LittleEndian.PutUint64(iv[8:], uint64(i/aes.BlockSize)) // Set the counter
 
-	for i := 0; i < len(pt); i += aes.BlockSize {
-		//create a new iv for each block
-		iv := append(nonceBytes, make([]byte, 8)...)                   // 8 bytes for the nonce and 8 for the counter
-		binary.LittleEndian.PutUint64(iv[8:], uint64(i/aes.BlockSize)) // set the counter
-
-		//initialize ctr for this block only
-		stream := cipher.NewCTR(block, iv)
-		stream.XORKeyStream(plaintext[i:], pt[i:])
+		// Initialize CTR mode stream cipher with the new IV
+		stream := cipher.NewCTR(cipherBlock, iv)
+		stream.XORKeyStream(plaintext[i:], data[i:])
 	}
 
-	return plaintext
+	return plaintext, nil
 }
 
-func AES_CTR_Encrypt(pt, key, nonce []byte) []byte {
-	ciph, err := aes.NewCipher(key)
+// EncryptAES_CTR encrypts the given data using AES in CTR mode
+func EncryptAES_CTR(data, key, nonce []byte) ([]byte, error) {
+	cipherBlock, err := aes.NewCipher(key)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	size := ciph.BlockSize()
-	if len(nonce) != size/2 {
-		return nil
-	}
-	chunkEnc := util.Chunkify(pt, size)
-	chunkDec := make([]string, len(chunkEnc))
-
-	var wg sync.WaitGroup
-	wg.Add(len(chunkEnc))
-
-	for ctr := 0; ctr < len(chunkEnc); ctr++ {
-		go func(lCtr int64, chunk []byte) {
-			defer wg.Done()
-			b := make([]byte, 8)
-			binary.LittleEndian.PutUint64(b, uint64(lCtr))
-			conc := append(nonce, b...)
-			ks := AES_ECB_Encrypt(conc, key)
-			chunkDec[lCtr] = string(util.RXor(chunk, ks))
-		}(int64(ctr), chunkEnc[ctr])
+	blockSize := cipherBlock.BlockSize()
+	if len(nonce) != blockSize/2 {
+		return nil, errors.New("invalid nonce size")
 	}
 
-	wg.Wait()
+	chunks := util.Chunkify(data, blockSize)
+	encryptedChunks := make([]string, len(chunks))
 
-	return []byte(strings.Join(chunkDec, ""))
+	// Process chunks sequentially
+	for i, chunk := range chunks {
+		b := make([]byte, 8)
+		binary.LittleEndian.PutUint64(b, uint64(i))
+		iv := append(nonce, b...)
+		ks, err := EncryptAES_ECB(iv, key) // Reuse the ECB encryption for CTR
+
+		if err != nil {
+			return nil, err
+		}
+
+		// XOR the chunk with the keystream
+		xoredChunk, err := util.Xor(chunk, ks)
+		if err != nil {
+			return nil, err
+		}
+		encryptedChunks[i] = string(xoredChunk)
+	}
+
+	return []byte(strings.Join(encryptedChunks, "")), nil
 }

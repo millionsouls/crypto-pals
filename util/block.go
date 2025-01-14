@@ -1,6 +1,8 @@
 package util
 
-import "strings"
+import (
+	"strings"
+)
 
 // help functions for block ciphers
 // chunkify - chunks a byte slice in 2x2 # sized blocks
@@ -31,7 +33,6 @@ func Chunkify(data []byte, size int) [][]byte {
 
 func PKCS7(data []byte, size int) []byte {
 	var padLen int
-
 	if len(data) > size {
 		panic("PKCS7: Data greater than block size")
 	}
@@ -49,7 +50,6 @@ func PKCS7(data []byte, size int) []byte {
 	}
 
 	result := append(data, padding...)
-
 	return result
 }
 

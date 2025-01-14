@@ -24,11 +24,15 @@ func wrap_data(input []byte) []byte {
 	text = append(prefix, text...)
 	text = append(text, suffix...)
 
-	return crysuite.AES_CBC_Encrypt(text, key, iv)
+	ciphertext, err := crysuite.EncryptAES_CBC(text, key, iv)
+	if err != nil {
+		panic(err)
+	}
+	return ciphertext
 }
 
 func isAdmin(input []byte) bool {
-	dec := crysuite.AES_CBC_Decrypt(input, key, iv)
+	dec, _ := crysuite.DecryptAES_CBC(input, key, iv)
 	splits := strings.Split(string(dec), ";")
 	result := make(map[string]string)
 
@@ -53,10 +57,10 @@ func make_admin() []byte {
 
 	// fmt.Println(isAdmin(ct))
 
-	flip := util.RXor(block, append([]byte(";admin=true"), bytes.Repeat([]byte("A"), 11-len(";admin=true"))...))
+	flip, _ := util.Xor(block, append([]byte(";admin=true"), bytes.Repeat([]byte("A"), 11-len(";admin=true"))...))
 	pad := append(bytes.Repeat([]byte("\x00"), 16*3-len(flip)), flip...)
 	pad = append(pad, bytes.Repeat([]byte("\x00"), len(ct)-len(pad))...)
-	new_ct := util.RXor(ct, pad)
+	new_ct, _ := util.Xor(ct, pad)
 
 	return new_ct
 }

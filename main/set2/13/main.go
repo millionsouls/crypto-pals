@@ -62,7 +62,11 @@ func aes(str string, key []byte) []byte {
 	prof := createProfile(str)
 	kvProf := kvEncode(prof)
 
-	return crysuite.AES_ECB_Encrypt([]byte(kvProf), key)
+	encrypted, err := crysuite.EncryptAES_ECB([]byte(kvProf), key)
+	if err != nil {
+		panic(err)
+	}
+	return encrypted
 }
 
 func main() {
@@ -86,7 +90,7 @@ func main() {
 	aesProfile := aes(user, key)
 
 	fmt.Println("\nEncoder tests:")
-	dProfile := crysuite.AES_ECB_Decrypt(aesProfile, key)
+	dProfile, _ := crysuite.DecryptAES_ECB(aesProfile, key)
 	fmt.Println(string(dProfile))
 	fmt.Println(kvParse(string(dProfile)))
 
@@ -95,7 +99,11 @@ func main() {
 	aProfile := aes("user@gmail.comadmin", key)
 
 	encode := append(uProfile[:32], aProfile[16:32]...)
-	decoded := string(crysuite.AES_ECB_Decrypt(encode, key))
+	decodedBytes, err := crysuite.DecryptAES_ECB(encode, key)
+	if err != nil {
+		panic(err)
+	}
+	decoded := string(decodedBytes)
 
 	fmt.Println(decoded)
 	fmt.Println(kvParse(decoded))

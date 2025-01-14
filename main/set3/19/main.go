@@ -16,7 +16,7 @@ func enc(strArray []string) [][]byte {
 	bArrArr := make([][]byte, len(strArray))
 
 	for i, val := range strArray {
-		enc := crysuite.AES_CTR_Encrypt(util.DecodeB64(val), key, bytes.Repeat([]byte("\x00"), 8))
+		enc, _ := crysuite.EncryptAES_CTR(util.DecodeB64(val), key, bytes.Repeat([]byte("\x00"), 8))
 		bArrArr[i] = enc
 	}
 

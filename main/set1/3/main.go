@@ -68,7 +68,7 @@ func main() {
 
 	// test single-byte characters
 	for i := 0; i <= 255; i++ {
-		xored := util.Xor(byte(i), data)
+		xored, _ := util.Xor([]byte{byte(i)}, data)
 		cleaned := cleanText(xored)
 		score := chiSquaredScore(cleaned)
 

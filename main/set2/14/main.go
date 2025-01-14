@@ -14,7 +14,11 @@ import (
 var key []byte
 
 func theOracle(input []byte) []byte {
-	return crysuite.AES_ECB_Encrypt(input, key)
+	encrypted, err := crysuite.EncryptAES_ECB(input, key)
+	if err != nil {
+		panic(err)
+	}
+	return encrypted
 }
 
 func findKeySize() int {
@@ -56,7 +60,7 @@ func main() {
 	fmt.Println("Finding key size")
 	findKeySize()
 
-	isECB := util.DetectECB(encrypted, len(key))
+	isECB := crysuite.DetectECB(encrypted, len(key))
 	fmt.Println(isECB)
 
 }

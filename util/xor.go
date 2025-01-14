@@ -27,30 +27,25 @@ var FreqTable = map[rune]float64{
 	'z': 0.0007,
 }
 
-func Xor(key byte, b []byte) []byte {
+func Xor(key []byte, b []byte) ([]byte, error) {
+	if len(b) == 0 {
+		return nil, nil
+	}
+
 	result := make([]byte, len(b))
-	for i := 0; i < len(b); i++ {
-		result[i] = b[i] ^ key
-	}
-	return result
-}
 
-func RXor(key []byte, b []byte) []byte {
-	diff := len(b) / len(key)
-	remain := len(b) % len(key)
-	newKey := make([]byte, 0, len(b))
-
-	for i := 0; i < diff; i++ {
-		newKey = append(newKey, key...)
-	}
-	newKey = append(newKey, key[:remain]...)
-
-	res := make([]byte, len(b))
-	for i := 0; i < len(b); i++ {
-		res[i] = b[i] ^ newKey[i]
+	if len(key) == 1 {
+		for i := 0; i < len(b); i++ {
+			result[i] = b[i] ^ key[0]
+		}
+	} else {
+		keyLength := len(key)
+		for i := 0; i < len(b); i++ {
+			result[i] = b[i] ^ key[i%keyLength]
+		}
 	}
 
-	return res
+	return result, nil
 }
 
 func ChiSquaredScore(text []byte) float64 {
@@ -145,7 +140,10 @@ func FindXOR(data []byte) (byte, string, float64) {
 	bestProb := 0.0
 
 	for i := 0; i <= 255; i++ {
-		xored := Xor(byte(i), data)
+		xored, err := Xor([]byte{byte(i)}, data)
+		if err != nil {
+			continue
+		}
 		// cleaned := CleanText(xored)
 		score, prob := NewChiSquared(xored)
 
@@ -214,6 +212,6 @@ func ComputeKey(data []byte, key int) ([]byte, []byte) {
 		keys[i] = k
 	}
 
-	dec := RXor(keys, data) //
+	dec, _ := Xor(keys, data) //
 	return dec, keys
 }

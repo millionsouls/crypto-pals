@@ -9,7 +9,7 @@ import (
 
 func main() {
 	str := "Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal"
-	newStr := util.RXor([]byte("ICE"), []byte(str))
+	newStr, _ := util.Xor([]byte("ICE"), []byte(str))
 
 	fStr := hex.EncodeToString(newStr)
 

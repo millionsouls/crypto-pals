@@ -3,7 +3,6 @@ package main
 //ECB/CBC detection oracle
 import (
 	"crypto-pals/crysuite"
-	"crypto-pals/util"
 	"crypto/rand"
 	"fmt"
 	"math/big"
@@ -33,10 +32,10 @@ func encryptionOracle(input []byte) ([]byte, []byte) {
 	switch choice.Int64() {
 	case 0:
 		fmt.Println("Using ECB")
-		out = crysuite.AES_ECB_Encrypt(input, key)
+		out, _ = crysuite.EncryptAES_ECB(input, key)
 	case 1:
 		fmt.Println("Using CBC")
-		out = crysuite.AES_CBC_Encrypt(input, key, []byte("\x00"))
+		out, _ = crysuite.EncryptAES_CBC(input, key, []byte("\x00"))
 	}
 
 	return out, key
@@ -51,13 +50,21 @@ func main() {
 	}
 
 	encrypted, key := encryptionOracle(text)
-	test := util.DetectECB(encrypted, len(key))
+	test := crysuite.DetectECB(encrypted, len(key))
 
 	if test {
 		fmt.Println("Is ECB")
-		fmt.Println(string(crysuite.AES_ECB_Decrypt(encrypted, key)))
+		decrypted, err := crysuite.DecryptAES_ECB(encrypted, key)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(decrypted))
 	} else {
 		fmt.Println("Is CBC")
-		fmt.Println(string(crysuite.AES_CBC_Decrypt(encrypted, key, []byte("\x00"))))
+		decrypted, err := crysuite.DecryptAES_CBC(encrypted, key, []byte(""))
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(decrypted))
 	}
 }

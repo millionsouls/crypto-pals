@@ -24,13 +24,13 @@ func choose_str() ([]byte, string) {
 	rndIndex := rand.Intn(len(strArray))
 	rndStr := util.DecodeB64(strArray[rndIndex])
 
-	enc := crysuite.AES_CBC_Encrypt(rndStr, key, iv)
+	enc, _ := crysuite.EncryptAES_CBC(rndStr, key, iv)
 
 	return enc, string(rndStr)
 }
 
 func valid_pad(enc []byte) bool {
-	dec := crysuite.AES_CBC_Decrypt(enc, key, iv)
+	dec, _ := crysuite.DecryptAES_CBC(enc, key, iv)
 	veri := util.DetectPad(string(dec), len(key))
 
 	return veri

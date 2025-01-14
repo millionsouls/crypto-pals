@@ -102,7 +102,7 @@ func computeKey(data []byte, key int) ([]byte, []byte) {
 		keys[i] = k
 	}
 
-	dec := util.RXor(keys, data) //
+	dec, _ := util.Xor(keys, data) //
 	return dec, keys
 }
 

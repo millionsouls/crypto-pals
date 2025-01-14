@@ -11,13 +11,12 @@ import (
 func main() {
 	data, err := os.ReadFile("data.txt")
 	key := []byte("YELLOW SUBMARINE")
-	iv := []byte("\x00")
 
 	if err != nil {
 		panic(err)
 	}
 
-	text := crysuite.AES_CBC_Decrypt(util.DecodeB64(string(data)), key, iv)
+	text, _ := crysuite.DecryptAES_CBC(util.DecodeB64(string(data)), key, []byte(""))
 
 	fmt.Println(string(text))
 }
