@@ -2,7 +2,7 @@ package main
 
 // Repeating-key XOR
 import (
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"encoding/hex"
 	"fmt"
 )

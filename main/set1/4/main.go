@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 )
 
 func main() {

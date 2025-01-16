@@ -1,7 +1,7 @@
 package main
 
 import (
-	"crypto-pals/crysuite"
+	"crypto-pals/lib/crysuite"
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"

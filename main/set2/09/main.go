@@ -3,7 +3,7 @@ package main
 // PKCS#7 Padding
 
 import (
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"fmt"
 )
 

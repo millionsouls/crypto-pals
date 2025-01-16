@@ -6,7 +6,7 @@ import (
 	"math"
 	"unicode"
 
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 )
 
 var freqTable = map[rune]float64{

@@ -3,7 +3,7 @@ package main
 // Find AES ECB
 import (
 	"bufio"
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"fmt"
 	"os"
 )

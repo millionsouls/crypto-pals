@@ -6,7 +6,7 @@ import (
 	"os"
 	"sort"
 
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 )
 
 /*

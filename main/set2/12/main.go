@@ -3,8 +3,8 @@ package main
 //Byte at a time ECB decryption
 import (
 	"bytes"
-	"crypto-pals/crysuite"
-	"crypto-pals/util"
+	"crypto-pals/lib/crysuite"
+	"crypto-pals/lib/util"
 	"fmt"
 	"os"
 )

@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"crypto-pals/crysuite"
+	"crypto-pals/lib/crysuite"
 	"crypto/rand"
 	"fmt"
 	"math/big"

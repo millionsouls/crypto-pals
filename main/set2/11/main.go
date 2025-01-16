@@ -2,7 +2,7 @@ package main
 
 //ECB/CBC detection oracle
 import (
-	"crypto-pals/crysuite"
+	"crypto-pals/lib/crysuite"
 	"crypto/rand"
 	"fmt"
 	"math/big"

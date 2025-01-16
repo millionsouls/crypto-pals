@@ -2,7 +2,7 @@ package main
 
 //PKCS7 verification
 import (
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"fmt"
 )
 

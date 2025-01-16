@@ -2,7 +2,7 @@ package main
 
 // AES ECB decryption
 import (
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"crypto/aes"
 	"fmt"
 	"os"

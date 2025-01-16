@@ -2,8 +2,8 @@ package main
 
 // AES-CTR
 import (
-	"crypto-pals/crysuite"
-	"crypto-pals/util"
+	"crypto-pals/lib/crysuite"
+	"crypto-pals/lib/util"
 	"fmt"
 )
 

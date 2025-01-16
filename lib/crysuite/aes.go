@@ -7,7 +7,7 @@ import (
 	"errors"
 	"strings"
 
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 )
 
 // DetectECB checks if a ciphertext uses ECB mode by finding repeating blocks

@@ -2,7 +2,7 @@ package main
 
 // XOR two strings
 import (
-	"crypto-pals/util"
+	"crypto-pals/lib/util"
 	"encoding/hex"
 	"fmt"
 )
