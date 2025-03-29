@@ -20,7 +20,7 @@ func passVerify(salt []byte, password string) *big.Int {
 	return v
 }
 
-func generateServerB(b *big.Int, v *big.Int) *big.Int {
+func GenerateB(b *big.Int, v *big.Int) *big.Int {
 	B := new(big.Int).Set(k)
 	B.Mul(B, v)
 	temp := new(big.Int).Exp(g, b, N)
@@ -47,7 +47,7 @@ func handleConnection(conn net.Conn) {
 	// Server-side private key b
 	b, _ := rand.Int(rand.Reader, N)
 	v := passVerify(salt, password)
-	B := generateServerB(b, v)
+	B := GenerateB(b, v)
 
 	// Send salt and B to client
 	fmt.Printf("Server Salt: %x\n", salt)
